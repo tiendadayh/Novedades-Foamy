@@ -9,16 +9,5 @@
         "destacado": false,
         "precio_mayoreo": 30.0,
         "min_mayoreo": 5
-    },
-    {
-        "codigo": "a2",
-        "articulo": "Globo Color Oro",
-        "precio": 35.0,
-        "stock": 10,
-        "categoria": "Fiestas",
-        "imagen": "imagenes_productos/IMG_a2_1790005411.jpg",
-        "destacado": false,
-        "precio_mayoreo": 30.0,
-        "min_mayoreo": 3
     }
 ]
