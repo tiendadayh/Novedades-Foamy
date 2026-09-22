@@ -5,13 +5,10 @@
         "precio": 12.0,
         "stock": 100,
         "categoria": "Pelota",
-        "imagen": "imagenes_productos/IMG_p001_1790051681_0.jpg,imagenes_productos/IMG_p001_1790051681_1.jpg,imagenes_productos/IMG_p001_1790051681_2.jpg,imagenes_productos/IMG_p001_1790051681_3.jpg,imagenes_productos/IMG_p001_1790051681_4.jpg",
+        "imagen": "imagenes_productos/IMG_p001_1790053525.jpg",
         "destacado": false,
         "precio_mayoreo": 8.33,
-        "min_mayoreo": 6,
-        "precio_caja": 480.0,
-        "piezas_caja": 60,
-        "grupo_caja": "Pelotas Trasparentes"
+        "min_mayoreo": 6
     },
     {
         "codigo": "p002",
@@ -22,10 +19,7 @@
         "imagen": "imagenes_productos/IMG_p002_1790042508.jpg",
         "destacado": false,
         "precio_mayoreo": 8.33,
-        "min_mayoreo": 6,
-        "precio_caja": 480.0,
-        "piezas_caja": 60,
-        "grupo_caja": "Pelotas Trasparentes"
+        "min_mayoreo": 6
     },
     {
         "codigo": "p003",
@@ -36,10 +30,7 @@
         "imagen": "imagenes_productos/IMG_p003_1790043246.jpg",
         "destacado": false,
         "precio_mayoreo": 8.33,
-        "min_mayoreo": 6,
-        "precio_caja": 480.0,
-        "piezas_caja": 60,
-        "grupo_caja": "Pelotas Trasparentes"
+        "min_mayoreo": 6
     },
     {
         "codigo": "p004",
@@ -50,10 +41,7 @@
         "imagen": "imagenes_productos/IMG_p004_1790043842.jpg",
         "destacado": false,
         "precio_mayoreo": 8.33,
-        "min_mayoreo": 6,
-        "precio_caja": 480.0,
-        "piezas_caja": 60,
-        "grupo_caja": "Pelotas Trasparentes"
+        "min_mayoreo": 6
     },
     {
         "codigo": "p005",
@@ -64,9 +52,6 @@
         "imagen": "imagenes_productos/IMG_p005_1790043945.jpg",
         "destacado": false,
         "precio_mayoreo": 8.33,
-        "min_mayoreo": 6,
-        "precio_caja": 480.0,
-        "piezas_caja": 60,
-        "grupo_caja": "Pelotas Trasparentes"
+        "min_mayoreo": 6
     }
 ]
