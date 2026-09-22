@@ -872,6 +872,8 @@ body.dark-mode .img-header-inicio { background: #fdf7ec; padding: 14px 22px; bor
 .badge-mayoreo.activo { background: var(--accent-green); color: #fff; border-color: var(--accent-green); }
 body.dark-mode .badge-mayoreo { color: #7fd6a3; }
 body.dark-mode .badge-mayoreo.activo { color: #0f2a1b; background: #7fd6a3; border-color: #7fd6a3; }
+.badge-caja { display: inline-block; margin: 0 0 8px 6px; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 800; line-height: 1.3; background: rgba(41, 121, 255, 0.13); color: #1a56cc; border: 1px solid rgba(41, 121, 255, 0.35); }
+body.dark-mode .badge-caja { color: #8fb8ff; background: rgba(41, 121, 255, 0.18); border-color: rgba(41, 121, 255, 0.4); }
 .hint-mayoreo { font-size: 11px; color: #1c7a45; font-weight: 700; margin-top: 3px; }
 body.dark-mode .hint-mayoreo { color: #7fd6a3; }
 #info-ahorro-mayoreo { display: none; margin: 8px 0 12px 0; padding: 9px 12px; border-radius: 12px; background: rgba(47, 158, 94, 0.13); color: #1c7a45; font-weight: 800; font-size: 0.9rem; }
@@ -1810,6 +1812,12 @@ function generarHTMLTarjeta(prod, esDestacada = false) {
         bloquePrecio = `<p class="precio-menudeo">${formatearDinero(prod.precio)}</p>` +
             (infoMay.activo ? `<span class="badge-mayoreo">Mayoreo: ${formatearDinero(infoMay.precio)} c/u desde ${infoMay.minimo} pzs</span>` : '');
     }
+    // Precio por caja completa: es aparte del carrito, solo un aviso para
+    // que el cliente sepa que existe esa opción (y que viene surtida).
+    const infoCajaProd = infoCaja(prod);
+    const bloqueCaja = infoCajaProd.activo
+        ? `<span class="badge-caja">📦 Por caja: ${formatearDinero(infoCajaProd.precio)} (${infoCajaProd.piezas} pzs surtidas, ${formatearDinero(infoCajaProd.porPieza)} c/u)</span>`
+        : '';
     const esFavorito = WISHLIST_GLOBAL.includes(prod.codigo) ? 'en-wishlist' : '';
 
     let botonFilaHTML = '';
@@ -1842,6 +1850,7 @@ function generarHTMLTarjeta(prod, esDestacada = false) {
             <h3>${artLimpio}</h3>
             <div class="${cStock}">${txtStock}</div>
             ${bloquePrecio}
+            ${bloqueCaja}
         </div>
         ${botonFilaHTML}
     </div>`;
@@ -2208,6 +2217,17 @@ function esMayoreoAplicado(prod, cantidad) {
 }
 function precioUnitarioParaCantidad(prod, cantidad) {
     return esMayoreoAplicado(prod, cantidad) ? infoMayoreo(prod).precio : (parseFloat(prod.precio) || 0);
+}
+
+// PRECIO POR CAJA: es solo informativo (el cliente pide la caja completa
+// aparte, por WhatsApp/en tienda; no se agrega al carrito por piezas). Si
+// el producto trae precio_caja y piezas_caja, se le avisa al cliente que
+// también puede llevarla completa, y que viene surtida.
+function infoCaja(prod) {
+    const pc = parseFloat(prod.precio_caja) || 0;
+    const pz = parseInt(prod.piezas_caja) || 0;
+    if (pc <= 0 || pz <= 0) return { activo: false };
+    return { activo: true, precio: pc, piezas: pz, porPieza: pc / pz };
 }
 
 function formatearDinero(numero) {
