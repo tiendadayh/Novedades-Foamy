@@ -1637,6 +1637,19 @@ function configurarWebSockets() {
 
         const productosFirebase = Object.values(datos);
 
+        // Quita del catálogo local los productos que ya NO vienen en este
+        // snapshot de Firebase, es decir, los que se borraron desde el POS.
+        // Sin esto, un producto eliminado se quedaba visible en la tienda
+        // hasta que alguien recargaba la página a mano.
+        const codigosFirebase = new Set(productosFirebase.map(p => p.codigo));
+        const huboEliminados = INVENTARIO_GLOBAL.some(p => !codigosFirebase.has(p.codigo));
+        if (huboEliminados) {
+            INVENTARIO_GLOBAL = INVENTARIO_GLOBAL.filter(p => codigosFirebase.has(p.codigo));
+            const carritoAntes = carrito.length;
+            carrito = carrito.filter(item => codigosFirebase.has(item.codigo));
+            if (carrito.length !== carritoAntes) guardarCarritoEnLocalStorage();
+        }
+
         productosFirebase.forEach((prodNuevo) => {
             const producto = INVENTARIO_GLOBAL.find(p => p.codigo === prodNuevo.codigo);
 
