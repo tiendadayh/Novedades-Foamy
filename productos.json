@@ -5,7 +5,7 @@
         "precio": 12.0,
         "stock": 100,
         "categoria": "Pelota",
-        "imagen": "imagenes_productos/IMG_p001_1790039768.jpg",
+        "imagen": "imagenes_productos/IMG_p001_1790051681_0.jpg,imagenes_productos/IMG_p001_1790051681_1.jpg,imagenes_productos/IMG_p001_1790051681_2.jpg,imagenes_productos/IMG_p001_1790051681_3.jpg,imagenes_productos/IMG_p001_1790051681_4.jpg",
         "destacado": false,
         "precio_mayoreo": 8.33,
         "min_mayoreo": 6,
