@@ -876,6 +876,10 @@ body.dark-mode .badge-mayoreo.activo { color: #0f2a1b; background: #7fd6a3; bord
 body.dark-mode .hint-mayoreo { color: #7fd6a3; }
 #info-ahorro-mayoreo { display: none; margin: 8px 0 12px 0; padding: 9px 12px; border-radius: 12px; background: rgba(47, 158, 94, 0.13); color: #1c7a45; font-weight: 800; font-size: 0.9rem; }
 body.dark-mode #info-ahorro-mayoreo { color: #7fd6a3; }
+.btn-caja { display: block; width: 100%; margin: 0 0 10px 0; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--accent-green); background: transparent; color: #1c7a45; font-weight: 800; font-size: 12.5px; cursor: pointer; transition: background .15s, color .15s; }
+.btn-caja:hover { background: var(--accent-green); color: #fff; }
+body.dark-mode .btn-caja { color: #7fd6a3; border-color: #7fd6a3; }
+body.dark-mode .btn-caja:hover { background: #7fd6a3; color: #0f2a1b; }
 .tarjeta-cant-input, .cart-qty-input { width: 54px; text-align: center; border: none; background: transparent; font-weight: 800; font-size: 14px; color: var(--text); font-family: inherit; -moz-appearance: textfield; appearance: textfield; padding: 0; }
 .cart-qty-input { width: 52px; border: 1px solid var(--border); border-radius: 6px; padding: 2px 0; background: var(--input-bg); }
 .tarjeta-cant-input::-webkit-outer-spin-button, .tarjeta-cant-input::-webkit-inner-spin-button,
@@ -964,13 +968,13 @@ body.dark-mode .seg-cancelado { color: #ff8c87; }
 
             <div class="anuncio-container" id="anuncio-container-principal">
                 <div class="anuncio-card sin-imagen" id="banner-card">
-                    <span class="badge-live" id="banner-badge">Menudeo y mayoreo</span>
+                    <span class="badge-live" id="banner-badge">Menudeo, mayoreo y por caja</span>
                     <div class="anuncio-img-wrapper" id="banner-img-wrapper" style="display: none;">
                         <img src="" alt="Banner" class="anuncio-img" id="banner-img" onerror="this.onerror=null; document.getElementById('banner-img-wrapper').style.display='none'">
                     </div>
                     <div class="anuncio-footer">
                         <h3 class="anuncio-titulo" id="banner-titulo">¡Bienvenido a Novedades El Foamy!</h3>
-                        <p class="anuncio-subtitulo" id="banner-subtitulo">Papelería, regalos, fiestas, globos, peluches y decoraciones. En los productos con la etiqueta MAYOREO, el precio por pieza baja desde cierta cantidad.</p>
+                        <p class="anuncio-subtitulo" id="banner-subtitulo">Papelería, regalos, fiestas, globos, peluches y decoraciones. En los productos con etiqueta MAYOREO o CAJA, el precio por pieza baja desde cierta cantidad.</p>
                     </div>
                 </div>
             </div>
@@ -1800,16 +1804,25 @@ function generarHTMLTarjeta(prod, esDestacada = false) {
     const bDer = arrImg.length > 1 ? `<button class="carousel-btn right" onclick="moverImagenCarrusel('${prod.codigo}', 1); event.stopPropagation();">▶</button>` : '';
     const badgeDestacado = (!esDestacada && prod.destacado) ? `<div class="badge-destacado">OFERTA</div>` : '';
 
-    // Precio: menudeo, y si el producto tiene mayoreo se muestra desde cuántas piezas aplica
+    // Precio: menudeo, y si el producto tiene mayoreo/caja se muestra desde
+    // cuántas piezas aplica (la caja es el escalón más alto)
     const infoMay = infoMayoreo(prod);
+    const infoCj = infoCaja(prod);
     let bloquePrecio;
-    if (infoMay.activo && cantidadEnCarrito >= infoMay.minimo) {
+    if (infoCj.activo && cantidadEnCarrito >= infoCj.piezas) {
+        bloquePrecio = `<p class="precio-menudeo">${formatearDinero(infoCj.precio)} <span class="precio-tachado">${formatearDinero(prod.precio)}</span></p>
+            <span class="badge-mayoreo activo">★ Precio de caja aplicado</span>`;
+    } else if (infoMay.activo && cantidadEnCarrito >= infoMay.minimo) {
         bloquePrecio = `<p class="precio-menudeo">${formatearDinero(infoMay.precio)} <span class="precio-tachado">${formatearDinero(prod.precio)}</span></p>
             <span class="badge-mayoreo activo">★ Precio de mayoreo aplicado</span>`;
     } else {
         bloquePrecio = `<p class="precio-menudeo">${formatearDinero(prod.precio)}</p>` +
+            (infoCj.activo ? `<span class="badge-mayoreo">Caja: ${formatearDinero(infoCj.precioCaja)} c/${infoCj.piezas} pzs (${formatearDinero(infoCj.precio)} c/u)</span>` : '') +
             (infoMay.activo ? `<span class="badge-mayoreo">Mayoreo: ${formatearDinero(infoMay.precio)} c/u desde ${infoMay.minimo} pzs</span>` : '');
     }
+    const botonCajaHTML = (infoCj.activo && !esAgotado)
+        ? `<button class="btn-caja" onclick="comprarPorCaja('${prod.codigo}')">📦 Comprar por caja (${infoCj.piezas} pzs)</button>`
+        : '';
     const esFavorito = WISHLIST_GLOBAL.includes(prod.codigo) ? 'en-wishlist' : '';
 
     let botonFilaHTML = '';
@@ -1842,6 +1855,7 @@ function generarHTMLTarjeta(prod, esDestacada = false) {
             <h3>${artLimpio}</h3>
             <div class="${cStock}">${txtStock}</div>
             ${bloquePrecio}
+            ${botonCajaHTML}
         </div>
         ${botonFilaHTML}
     </div>`;
@@ -1869,6 +1883,19 @@ window.agregarAlCarrito = function (codigo) {
         reproducirSonido('error');
         alert("Lo sentimos, ya no quedan más unidades disponibles.");
     }
+};
+
+window.comprarPorCaja = function(codigo) {
+    const prod = INVENTARIO_GLOBAL.find(p => p.codigo === codigo);
+    if (!prod) return;
+    const pz = parseInt(prod.piezas_caja) || 0;
+    if (pz < 2) return;
+    if (pz > prod.stock) {
+        reproducirSonido('error');
+        alert(`Solo hay ${prod.stock} pzs disponibles de este producto (la caja trae ${pz}).`);
+        return;
+    }
+    window.establecerCantidad(codigo, pz);
 };
 
 window.establecerCantidad = function(codigo, valor) {
@@ -2202,11 +2229,35 @@ function infoMayoreo(prod) {
     const mn = parseInt(prod.min_mayoreo) || 0;
     return { activo: mn >= 2 && pm > 0 && pm < precio, precio: pm, minimo: mn };
 }
+// =========================================================================
+// PRECIO POR CAJA
+// =========================================================================
+// Cada producto trae (desde el POS) precio_caja y piezas_caja. Es el escalón
+// de descuento MÁS ALTO: si de un mismo artículo se llevan piezas_caja piezas
+// o más, TODAS se cobran al precio por pieza de la caja (precio_caja /
+// piezas_caja), por encima del precio de mayoreo. Misma regla que usa el POS.
+function infoCaja(prod) {
+    const precioUnidadPorPieza = precioPorPiezaCaja(prod);
+    const pz = parseInt(prod.piezas_caja) || 0;
+    const pc = parseFloat(prod.precio_caja) || 0;
+    return { activo: pz >= 2 && pc > 0, precio: precioUnidadPorPieza, precioCaja: pc, piezas: pz };
+}
+function precioPorPiezaCaja(prod) {
+    const pz = parseInt(prod.piezas_caja) || 0;
+    const pc = parseFloat(prod.precio_caja) || 0;
+    return pz > 0 ? (pc / pz) : 0;
+}
+function esCajaAplicada(prod, cantidad) {
+    const c = infoCaja(prod);
+    return c.activo && cantidad >= c.piezas;
+}
 function esMayoreoAplicado(prod, cantidad) {
+    if (esCajaAplicada(prod, cantidad)) return false;
     const m = infoMayoreo(prod);
     return m.activo && cantidad >= m.minimo;
 }
 function precioUnitarioParaCantidad(prod, cantidad) {
+    if (esCajaAplicada(prod, cantidad)) return infoCaja(prod).precio;
     return esMayoreoAplicado(prod, cantidad) ? infoMayoreo(prod).precio : (parseFloat(prod.precio) || 0);
 }
 
@@ -2474,17 +2525,19 @@ function actualizarCarritoVisual() {
         if (!prod) return;
 
         const precioUnit = precioUnitarioParaCantidad(prod, item.cantidad);
+        const cajaAplicada = esCajaAplicada(prod, item.cantidad);
         const mayoreoAplicado = esMayoreoAplicado(prod, item.cantidad);
         const infoMay = infoMayoreo(prod);
+        const infoCj = infoCaja(prod);
         const subtotalProducto = precioUnit * item.cantidad;
         subtotalGeneral += subtotalProducto;
-        if (mayoreoAplicado) ahorroMayoreo += (parseFloat(prod.precio) - precioUnit) * item.cantidad;
+        if (cajaAplicada || mayoreoAplicado) ahorroMayoreo += (parseFloat(prod.precio) - precioUnit) * item.cantidad;
 
         if (configCupon) {
             const catProd = prod.categoria ? prod.categoria.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "general";
             const catRestringida = configCupon.categoriaRestringida ? configCupon.categoriaRestringida.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "";
             if (!configCupon.categoriaRestringida || catProd === catRestringida) {
-                if (mayoreoAplicado && !CUPON_APLICA_EN_MAYOREO) {
+                if ((cajaAplicada || mayoreoAplicado) && !CUPON_APLICA_EN_MAYOREO) {
                     cuponOmitidoPorMayoreo = true;
                 } else {
                     montoDescuento += subtotalProducto * configCupon.descuento;
@@ -2496,14 +2549,16 @@ function actualizarCarritoVisual() {
         let imgNombre = arrImg[0] ? arrImg[0].split(/[/\\\\]/).pop() : '';
         let rutaImagen = imgNombre ? `imagenes_productos/${imgNombre}` : 'https://placehold.co/50x50?text=Prod';
         const artLimpio = prod.articulo.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        const etiquetaAplicada = cajaAplicada ? 'Caja' : (mayoreoAplicado ? 'Mayoreo' : '');
 
         const itemHTML = `
             <div class="item-carrito" style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border);">
                 <img src="${rutaImagen}" alt="${artLimpio}" style="width: 50px; height: 50px; object-fit: contain;" onerror="this.src='https://placehold.co/50x50';">
                 <div style="flex: 1; min-width: 0;">
                     <h4 style="margin:0; font-size:13px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${artLimpio}</h4>
-                    <span style="font-size: 12px; color: var(--primary-light); font-weight: bold;">${formatearDinero(precioUnit)}${mayoreoAplicado ? ` <span class="precio-tachado">${formatearDinero(prod.precio)}</span> <span class="badge-mayoreo activo" style="margin:0;">Mayoreo</span>` : ''}</span>
-                    ${(!mayoreoAplicado && infoMay.activo) ? `<div class="hint-mayoreo">Lleva ${infoMay.minimo - item.cantidad} más y pagas ${formatearDinero(infoMay.precio)} c/u</div>` : ''}
+                    <span style="font-size: 12px; color: var(--primary-light); font-weight: bold;">${formatearDinero(precioUnit)}${etiquetaAplicada ? ` <span class="precio-tachado">${formatearDinero(prod.precio)}</span> <span class="badge-mayoreo activo" style="margin:0;">${etiquetaAplicada}</span>` : ''}</span>
+                    ${(!cajaAplicada && !mayoreoAplicado && infoCj.activo) ? `<div class="hint-mayoreo">Lleva ${infoCj.piezas - item.cantidad} más y pagas ${formatearDinero(infoCj.precio)} c/u (caja)</div>` : ''}
+                    ${(!cajaAplicada && !mayoreoAplicado && !infoCj.activo && infoMay.activo) ? `<div class="hint-mayoreo">Lleva ${infoMay.minimo - item.cantidad} más y pagas ${formatearDinero(infoMay.precio)} c/u</div>` : ''}
                     <div style="display: flex; align-items: center; gap: 6px; margin-top: 5px;">
                         <button onclick="cambiarCantidad('${prod.codigo}', -1)">-</button>
                         <input class="cart-qty-input" type="number" inputmode="numeric" min="1" max="${prod.stock}" value="${item.cantidad}" aria-label="Cantidad de ${artLimpio}" onclick="this.select()" onchange="establecerCantidad('${prod.codigo}', this.value)">
@@ -2798,7 +2853,7 @@ async function generarPDFComprobante(datos) {
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(7.5);
         doc.setTextColor(120, 120, 120);
-        doc.text(`Cód. ${item.codigo}${item.mayoreo ? '  ·  Precio de mayoreo' : ''}`, colProducto, y + (nombreLineas.length > 1 ? 15 : 11));
+        doc.text(`Cód. ${item.codigo}${item.caja ? '  ·  Precio de caja' : (item.mayoreo ? '  ·  Precio de mayoreo' : '')}`, colProducto, y + (nombreLineas.length > 1 ? 15 : 11));
         doc.setTextColor(30, 30, 30);
 
         doc.setFontSize(9);
@@ -2896,18 +2951,20 @@ async function enviarPedidoFinal() {
         const prod = INVENTARIO_GLOBAL.find(p => p.codigo === item.codigo);
         if (prod) {
             const precioUnit = precioUnitarioParaCantidad(prod, item.cantidad);
+            const esCaj = esCajaAplicada(prod, item.cantidad);
             const esMay = esMayoreoAplicado(prod, item.cantidad);
             const sub = precioUnit * item.cantidad;
             subtotalProductos += sub;
             if (configCupon) {
                 const catProd = prod.categoria ? prod.categoria.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "general";
                 const catRestringida = configCupon.categoriaRestringida ? configCupon.categoriaRestringida.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "";
-                if ((!configCupon.categoriaRestringida || catProd === catRestringida) && (CUPON_APLICA_EN_MAYOREO || !esMay)) {
+                if ((!configCupon.categoriaRestringida || catProd === catRestringida) && (CUPON_APLICA_EN_MAYOREO || !(esCaj || esMay))) {
                     montoDescuento += sub * configCupon.descuento;
                 }
             }
-            textoMensajeWhatsApp += `▪️ ${item.cantidad}x [${prod.codigo}] ${prod.articulo}${esMay ? ` (mayoreo ${formatearDinero(precioUnit)} c/u)` : ''} - _${formatearDinero(sub)}_\n`;
-            productosParaAPI.push({ codigo: item.codigo, cantidad: item.cantidad, precio_unitario: precioUnit, mayoreo: esMay });
+            const etiquetaTxt = esCaj ? 'caja' : (esMay ? 'mayoreo' : '');
+            textoMensajeWhatsApp += `▪️ ${item.cantidad}x [${prod.codigo}] ${prod.articulo}${etiquetaTxt ? ` (${etiquetaTxt} ${formatearDinero(precioUnit)} c/u)` : ''} - _${formatearDinero(sub)}_\n`;
+            productosParaAPI.push({ codigo: item.codigo, cantidad: item.cantidad, precio_unitario: precioUnit, mayoreo: esMay, caja: esCaj });
 
             // Ruta de la imagen del producto para dibujarla en el PDF del comprobante.
             // Si no tiene imagen se deja vacía a propósito: así el PDF no intenta
@@ -2920,6 +2977,7 @@ async function enviarPedidoFinal() {
                 cantidad: item.cantidad,
                 precioUnit: precioUnit,
                 mayoreo: esMay,
+                caja: esCaj,
                 subtotal: sub,
                 rutaImagen: imgNombreItem ? `imagenes_productos/${imgNombreItem}` : ''
             });
