@@ -3,11 +3,13 @@
         "codigo": "a1",
         "articulo": "Globo Rosa",
         "precio": 35.0,
-        "stock": 5,
+        "stock": 10,
         "categoria": "Globos",
         "imagen": "imagenes_productos/IMG_a1_1789884436.jpg",
         "destacado": false,
         "precio_mayoreo": 30.0,
-        "min_mayoreo": 5
+        "min_mayoreo": 5,
+        "precio_caja": 25.0,
+        "piezas_caja": 60
     }
 ]
