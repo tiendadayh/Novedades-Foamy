@@ -11,5 +11,18 @@
         "min_mayoreo": 5,
         "precio_caja": 25.0,
         "piezas_caja": 60
+    },
+    {
+        "codigo": "p001",
+        "articulo": "Pelota Trasparente",
+        "precio": 12.0,
+        "stock": 100,
+        "categoria": "Pelota",
+        "imagen": "imagenes_productos/IMG_p001_1790039768.jpg",
+        "destacado": false,
+        "precio_mayoreo": 8.33,
+        "min_mayoreo": 6,
+        "precio_caja": 8.0,
+        "piezas_caja": 60
     }
 ]
