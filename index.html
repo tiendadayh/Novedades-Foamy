@@ -872,8 +872,32 @@ body.dark-mode .img-header-inicio { background: #fdf7ec; padding: 14px 22px; bor
 .badge-mayoreo.activo { background: var(--accent-green); color: #fff; border-color: var(--accent-green); }
 body.dark-mode .badge-mayoreo { color: #7fd6a3; }
 body.dark-mode .badge-mayoreo.activo { color: #0f2a1b; background: #7fd6a3; border-color: #7fd6a3; }
-.badge-caja { display: inline-block; margin: 0 0 8px 6px; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 800; line-height: 1.3; background: rgba(41, 121, 255, 0.13); color: #1a56cc; border: 1px solid rgba(41, 121, 255, 0.35); }
+.badge-caja { display: inline-block; margin: 0 0 8px 6px; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 800; line-height: 1.3; background: rgba(41, 121, 255, 0.13); color: #1a56cc; border: 1px solid rgba(41, 121, 255, 0.35); font-family: inherit; cursor: pointer; }
 body.dark-mode .badge-caja { color: #8fb8ff; background: rgba(41, 121, 255, 0.18); border-color: rgba(41, 121, 255, 0.4); }
+.badge-caja:hover { background: rgba(41, 121, 255, 0.26); }
+.badge-caja .caja-cta { text-decoration: underline; margin-left: 3px; }
+
+/* === Armador de caja/mayoreo surtido (modal) === */
+#modal-caja .modal-contenido { max-width: 640px; }
+.caja-resumen-header { text-align: center; margin-bottom: 6px; }
+.caja-resumen-header h2 { margin: 0 0 4px 0; font-size: 1.15rem; }
+.caja-resumen-header p { margin: 0; color: var(--text-light); font-size: 13px; }
+.caja-progreso-wrap { margin: 14px 0; }
+.caja-progreso-texto { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; margin-bottom: 5px; }
+.caja-progreso-barra { height: 10px; border-radius: 999px; background: rgba(120,120,120,0.18); overflow: hidden; }
+.caja-progreso-relleno { height: 100%; border-radius: 999px; background: var(--accent-green); transition: width .2s ease; }
+.caja-progreso-relleno.excedido { background: var(--danger, #d33); }
+.caja-carrusel { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x proximity; padding: 4px 2px 12px 2px; -webkit-overflow-scrolling: touch; }
+.caja-item { flex: 0 0 148px; scroll-snap-align: start; border: 1px solid var(--border); border-radius: 12px; padding: 10px; text-align: center; background: var(--card-bg); }
+.caja-item img { width: 100%; height: 100px; object-fit: contain; border-radius: 8px; margin-bottom: 6px; background: rgba(120,120,120,0.08); }
+.caja-item h5 { margin: 0 0 2px 0; font-size: 12px; line-height: 1.25; min-height: 30px; }
+.caja-item .caja-item-precio { font-size: 11px; color: var(--text-light); margin-bottom: 6px; }
+.caja-item-controles { display: flex; align-items: center; justify-content: center; gap: 6px; }
+.caja-item-controles button { width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--border); background: var(--input-bg); font-weight: 800; cursor: pointer; }
+.caja-item-controles input { width: 42px; text-align: center; border: 1px solid var(--border); border-radius: 6px; padding: 3px 0; background: var(--input-bg); color: var(--text); -moz-appearance: textfield; }
+.caja-item.sin-stock { opacity: 0.5; }
+.caja-total-fila { display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 15px; margin-top: 6px; }
+.caja-nota { font-size: 12px; color: var(--text-light); text-align: center; margin: 8px 0 0 0; }
 .hint-mayoreo { font-size: 11px; color: #1c7a45; font-weight: 700; margin-top: 3px; }
 body.dark-mode .hint-mayoreo { color: #7fd6a3; }
 #info-ahorro-mayoreo { display: none; margin: 8px 0 12px 0; padding: 9px 12px; border-radius: 12px; background: rgba(47, 158, 94, 0.13); color: #1c7a45; font-weight: 800; font-size: 0.9rem; }
@@ -1165,6 +1189,33 @@ body.dark-mode .seg-cancelado { color: #ff8c87; }
         </div>
     </div>
 
+    <!-- Armador de caja / mayoreo surtido -->
+    <div id="modal-caja" class="modal-despacho" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="caja-titulo">
+        <div class="modal-contenido">
+            <button type="button" onclick="cerrarModalCaja()" style="position:absolute; top:10px; right:14px; background:transparent; border:none; font-size:22px; cursor:pointer; color: var(--text-light);">✕</button>
+            <div class="caja-resumen-header">
+                <h2 id="caja-titulo">📦 Arma tu caja/mayoreo</h2>
+                <p id="caja-subtitulo"></p>
+            </div>
+            <div class="caja-progreso-wrap">
+                <div class="caja-progreso-texto">
+                    <span id="caja-progreso-texto">0 / 0 piezas</span>
+                    <span id="caja-progreso-precio"></span>
+                </div>
+                <div class="caja-progreso-barra"><div id="caja-progreso-relleno" class="caja-progreso-relleno" style="width:0%;"></div></div>
+            </div>
+            <div id="caja-carrusel" class="caja-carrusel"></div>
+            <div class="caja-total-fila">
+                <span>Total a pagar por la caja:</span>
+                <span id="caja-total-monto">$0.00</span>
+            </div>
+            <p class="caja-nota">Desliza para ver todos los modelos surtidos. Reparte las piezas como quieras entre los modelos, hasta completar el total de la caja.</p>
+            <div class="modal-acciones" style="text-align:center;">
+                <button type="button" id="caja-btn-agregar" class="btn" onclick="confirmarAgregarCaja()" disabled>🛒 Agregar caja al carrito</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Bienvenida: pide el nombre al entrar (opcional) -->
     <div id="modal-bienvenida" class="modal-despacho" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="bienvenida-titulo">
         <div class="modal-contenido" style="max-width: 420px; text-align: center;">
@@ -1287,7 +1338,7 @@ if (dbFirebase) {
             totalArticulos = carrito.reduce((acc, item) => acc + (item.cantidad || 0), 0);
             valorCarrito = carrito.reduce((acc, item) => {
                 const prod = INVENTARIO_GLOBAL.find(p => p.codigo === item.codigo);
-                return acc + (prod ? precioUnitarioParaCantidad(prod, item.cantidad || 0) * (item.cantidad || 0) : 0);
+                return acc + (prod ? precioUnitarioDeItem(item, prod) * (item.cantidad || 0) : 0);
             }, 0);
             valorCarrito = Math.round(valorCarrito * 100) / 100;
         } catch (e) { /* carrito o inventario aún no listos */ }
@@ -1829,7 +1880,7 @@ function generarHTMLTarjeta(prod, esDestacada = false) {
     // que el cliente sepa que existe esa opción (y que viene surtida).
     const infoCajaProd = infoCaja(prod);
     const bloqueCaja = infoCajaProd.activo
-        ? `<span class="badge-caja">📦 Por caja: ${formatearDinero(infoCajaProd.precio)} (${infoCajaProd.piezas} pzs surtidas, ${formatearDinero(infoCajaProd.porPieza)} c/u)</span>`
+        ? `<button type="button" class="badge-caja" onclick="event.stopPropagation(); abrirModalCaja('${prod.codigo}')">📦 Por caja: ${formatearDinero(infoCajaProd.precio)} (${infoCajaProd.piezas} pzs surtidas, ${formatearDinero(infoCajaProd.porPieza)} c/u)<span class="caja-cta">Armar caja ▸</span></button>`
         : '';
     const esFavorito = WISHLIST_GLOBAL.includes(prod.codigo) ? 'en-wishlist' : '';
 
@@ -2228,14 +2279,25 @@ function esMayoreoAplicado(prod, cantidad) {
     const m = infoMayoreo(prod);
     return m.activo && cantidad >= m.minimo;
 }
+// Si un renglón del carrito viene de una caja/mayoreo surtido armado por el
+// cliente (ver más abajo), su precio por pieza queda FIJO al precio de caja
+// (item.precioCajaUnit), sin importar cuántas piezas de ESE producto lleve
+// por sí solo. Todo el resto del sitio (carrito, ticket PDF, WhatsApp) debe
+// calcular el precio de un renglón con esta función, no directo con
+// precioUnitarioParaCantidad, para respetar ese precio de caja.
+function precioUnitarioDeItem(item, prod) {
+    if (item && item.precioCajaUnit) return item.precioCajaUnit;
+    return precioUnitarioParaCantidad(prod, item ? item.cantidad : 0);
+}
+
 function precioUnitarioParaCantidad(prod, cantidad) {
     return esMayoreoAplicado(prod, cantidad) ? infoMayoreo(prod).precio : (parseFloat(prod.precio) || 0);
 }
 
-// PRECIO POR CAJA: es solo informativo (el cliente pide la caja completa
-// aparte, por WhatsApp/en tienda; no se agrega al carrito por piezas). Si
-// el producto trae precio_caja y piezas_caja, se le avisa al cliente que
-// también puede llevarla completa, y que viene surtida.
+// PRECIO POR CAJA: si el producto trae precio_caja y piezas_caja, se puede
+// armar y agregar al carrito completa desde la tienda (ver abrirModalCaja).
+// Se entrega SURTIDA: si el producto tiene grupo_caja, la caja se arma
+// combinando piezas de todos los productos que comparten ese mismo grupo.
 function infoCaja(prod) {
     const pc = parseFloat(prod.precio_caja) || 0;
     const pz = parseInt(prod.piezas_caja) || 0;
@@ -2243,10 +2305,164 @@ function infoCaja(prod) {
     return { activo: true, precio: pc, piezas: pz, porPieza: pc / pz };
 }
 
+// Productos que forman parte de la misma caja/mayoreo surtido que "prod":
+// todos los que comparten su mismo "grupo_caja" (sin espacios extra,
+// insensible a mayúsculas). Si el producto no tiene grupo_caja, la caja es
+// solo de ese producto.
+function obtenerGrupoCaja(prod) {
+    const grupo = (prod.grupo_caja || '').trim().toLowerCase();
+    if (!grupo) return [prod];
+    const miembros = INVENTARIO_GLOBAL.filter(p => (p.grupo_caja || '').trim().toLowerCase() === grupo);
+    return miembros.length ? miembros : [prod];
+}
+
 function formatearDinero(numero) {
     let num = parseFloat(numero);
     return '$' + (isNaN(num) ? 0 : num).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
 }
+
+// =========================================================================
+// ARMADOR DE CAJA / MAYOREO SURTIDO
+// =========================================================================
+// El cliente reparte las piezas de la caja (piezas_caja) entre todos los
+// modelos del mismo grupo_caja, deslizando el carrusel. Al completar el
+// total exacto de piezas puede agregar todo el surtido al carrito de un
+// solo golpe, al precio por pieza de la caja (porPieza).
+let estadoCaja = null; // { grupo, piezas, precio, porPieza, cantidades: {codigo: n} }
+
+window.abrirModalCaja = function (codigoOrigen) {
+    const prodOrigen = INVENTARIO_GLOBAL.find(p => p.codigo === codigoOrigen);
+    if (!prodOrigen) return;
+    const infoCajaProd = infoCaja(prodOrigen);
+    if (!infoCajaProd.activo) return;
+
+    const grupo = obtenerGrupoCaja(prodOrigen).filter(p => p.stock > 0);
+    if (!grupo.length) {
+        alert('Por el momento no hay existencias de esta caja/mayoreo.');
+        return;
+    }
+
+    estadoCaja = {
+        grupo: grupo,
+        piezas: infoCajaProd.piezas,
+        precio: infoCajaProd.precio,
+        porPieza: infoCajaProd.porPieza,
+        cantidades: {}
+    };
+    grupo.forEach(p => { estadoCaja.cantidades[p.codigo] = 0; });
+
+    const modal = document.getElementById('modal-caja');
+    const subt = document.getElementById('caja-subtitulo');
+    if (subt) {
+        subt.innerText = grupo.length > 1
+            ? `Elige cómo repartir ${infoCajaProd.piezas} piezas surtidas entre estos ${grupo.length} modelos — ${formatearDinero(infoCajaProd.porPieza)} c/u`
+            : `${infoCajaProd.piezas} piezas surtidas — ${formatearDinero(infoCajaProd.porPieza)} c/u`;
+    }
+    renderModalCaja();
+    if (modal) modal.style.display = 'flex';
+};
+
+window.cerrarModalCaja = function () {
+    const modal = document.getElementById('modal-caja');
+    if (modal) modal.style.display = 'none';
+    estadoCaja = null;
+};
+
+function renderModalCaja() {
+    if (!estadoCaja) return;
+    const cont = document.getElementById('caja-carrusel');
+    if (!cont) return;
+
+    cont.innerHTML = estadoCaja.grupo.map(p => {
+        const arrImg = obtenerArregloImagenes(p);
+        const imgN = arrImg[0] ? arrImg[0].split(/[/\\\\]/).pop() : '';
+        const rImg = imgN ? `imagenes_productos/${imgN}` : 'https://placehold.co/150?text=Sin+foto';
+        const artLimpio = (p.articulo || '').replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        const cant = estadoCaja.cantidades[p.codigo] || 0;
+        const sinStock = p.stock <= 0;
+        return `
+        <div class="caja-item ${sinStock ? 'sin-stock' : ''}">
+            <img src="${rImg}" alt="${artLimpio}" onerror="this.src='https://placehold.co/150?text=Sin+foto';">
+            <h5>${artLimpio}</h5>
+            <div class="caja-item-precio">${p.codigo} · máx ${p.stock}</div>
+            <div class="caja-item-controles">
+                <button type="button" onclick="cambiarCantCaja('${p.codigo}', -1)" ${cant <= 0 ? 'disabled' : ''}>-</button>
+                <input type="number" inputmode="numeric" min="0" max="${p.stock}" value="${cant}" aria-label="Piezas de ${artLimpio}" onclick="this.select()" onchange="establecerCantCaja('${p.codigo}', this.value)">
+                <button type="button" onclick="cambiarCantCaja('${p.codigo}', 1)" ${sinStock ? 'disabled' : ''}>+</button>
+            </div>
+        </div>`;
+    }).join('');
+
+    actualizarProgresoCaja();
+}
+
+function actualizarProgresoCaja() {
+    if (!estadoCaja) return;
+    const total = Object.values(estadoCaja.cantidades).reduce((a, b) => a + b, 0);
+    const txt = document.getElementById('caja-progreso-texto');
+    const precioTxt = document.getElementById('caja-progreso-precio');
+    const relleno = document.getElementById('caja-progreso-relleno');
+    const totalMonto = document.getElementById('caja-total-monto');
+    const btn = document.getElementById('caja-btn-agregar');
+
+    if (txt) txt.innerText = `${total} / ${estadoCaja.piezas} piezas`;
+    if (precioTxt) precioTxt.innerText = `${formatearDinero(estadoCaja.porPieza)} c/u`;
+    const pct = Math.min(100, (total / estadoCaja.piezas) * 100);
+    if (relleno) {
+        relleno.style.width = pct + '%';
+        relleno.classList.toggle('excedido', total > estadoCaja.piezas);
+    }
+    if (totalMonto) totalMonto.innerText = formatearDinero(total * estadoCaja.porPieza);
+    if (btn) btn.disabled = (total !== estadoCaja.piezas);
+}
+
+window.cambiarCantCaja = function (codigo, delta) {
+    if (!estadoCaja) return;
+    const p = estadoCaja.grupo.find(x => x.codigo === codigo);
+    if (!p) return;
+    let n = (estadoCaja.cantidades[codigo] || 0) + delta;
+    n = Math.max(0, Math.min(p.stock, n));
+    estadoCaja.cantidades[codigo] = n;
+    renderModalCaja();
+};
+
+window.establecerCantCaja = function (codigo, valor) {
+    if (!estadoCaja) return;
+    const p = estadoCaja.grupo.find(x => x.codigo === codigo);
+    if (!p) return;
+    let n = parseInt(valor, 10);
+    if (isNaN(n) || n < 0) n = 0;
+    n = Math.min(p.stock, n);
+    estadoCaja.cantidades[codigo] = n;
+    renderModalCaja();
+};
+
+window.confirmarAgregarCaja = function () {
+    if (!estadoCaja) return;
+    const total = Object.values(estadoCaja.cantidades).reduce((a, b) => a + b, 0);
+    if (total !== estadoCaja.piezas) return;
+
+    Object.entries(estadoCaja.cantidades).forEach(([codigo, cant]) => {
+        if (cant <= 0) return;
+        const item = carrito.find(i => i.codigo === codigo);
+        if (item) {
+            item.cantidad += cant;
+            item.precioCajaUnit = estadoCaja.porPieza;
+            item.esCaja = true;
+        } else {
+            carrito.push({ codigo: codigo, cantidad: cant, precioCajaUnit: estadoCaja.porPieza, esCaja: true });
+        }
+    });
+
+    reproducirSonido('agregar');
+    guardarCarritoEnLocalStorage();
+    actualizarCarritoVisual();
+    filtrarCatalogo();
+    renderizarDestacados();
+    renderizarWishlist();
+    dispararAnimacionCarrito();
+    cerrarModalCaja();
+};
 
 function formatearFechaHumana(fechaISO) {
     if (!fechaISO) return "";
@@ -2506,18 +2722,20 @@ function actualizarCarritoVisual() {
         const prod = INVENTARIO_GLOBAL.find(p => p.codigo === item.codigo);
         if (!prod) return;
 
-        const precioUnit = precioUnitarioParaCantidad(prod, item.cantidad);
-        const mayoreoAplicado = esMayoreoAplicado(prod, item.cantidad);
+        const precioUnit = precioUnitarioDeItem(item, prod);
+        const esCajaItem = !!item.esCaja;
+        const mayoreoAplicado = !esCajaItem && esMayoreoAplicado(prod, item.cantidad);
         const infoMay = infoMayoreo(prod);
         const subtotalProducto = precioUnit * item.cantidad;
         subtotalGeneral += subtotalProducto;
         if (mayoreoAplicado) ahorroMayoreo += (parseFloat(prod.precio) - precioUnit) * item.cantidad;
+        if (esCajaItem) ahorroMayoreo += Math.max(0, (parseFloat(prod.precio) - precioUnit)) * item.cantidad;
 
         if (configCupon) {
             const catProd = prod.categoria ? prod.categoria.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "general";
             const catRestringida = configCupon.categoriaRestringida ? configCupon.categoriaRestringida.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "";
             if (!configCupon.categoriaRestringida || catProd === catRestringida) {
-                if (mayoreoAplicado && !CUPON_APLICA_EN_MAYOREO) {
+                if ((mayoreoAplicado || esCajaItem) && !CUPON_APLICA_EN_MAYOREO) {
                     cuponOmitidoPorMayoreo = true;
                 } else {
                     montoDescuento += subtotalProducto * configCupon.descuento;
@@ -2535,8 +2753,8 @@ function actualizarCarritoVisual() {
                 <img src="${rutaImagen}" alt="${artLimpio}" style="width: 50px; height: 50px; object-fit: contain;" onerror="this.src='https://placehold.co/50x50';">
                 <div style="flex: 1; min-width: 0;">
                     <h4 style="margin:0; font-size:13px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${artLimpio}</h4>
-                    <span style="font-size: 12px; color: var(--primary-light); font-weight: bold;">${formatearDinero(precioUnit)}${mayoreoAplicado ? ` <span class="precio-tachado">${formatearDinero(prod.precio)}</span> <span class="badge-mayoreo activo" style="margin:0;">Mayoreo</span>` : ''}</span>
-                    ${(!mayoreoAplicado && infoMay.activo) ? `<div class="hint-mayoreo">Lleva ${infoMay.minimo - item.cantidad} más y pagas ${formatearDinero(infoMay.precio)} c/u</div>` : ''}
+                    <span style="font-size: 12px; color: var(--primary-light); font-weight: bold;">${formatearDinero(precioUnit)}${mayoreoAplicado ? ` <span class="precio-tachado">${formatearDinero(prod.precio)}</span> <span class="badge-mayoreo activo" style="margin:0;">Mayoreo</span>` : ''}${esCajaItem ? ` <span class="precio-tachado">${formatearDinero(prod.precio)}</span> <span class="badge-caja" style="margin:0; cursor:default;">📦 Precio de caja</span>` : ''}</span>
+                    ${(!mayoreoAplicado && !esCajaItem && infoMay.activo) ? `<div class="hint-mayoreo">Lleva ${infoMay.minimo - item.cantidad} más y pagas ${formatearDinero(infoMay.precio)} c/u</div>` : ''}
                     <div style="display: flex; align-items: center; gap: 6px; margin-top: 5px;">
                         <button onclick="cambiarCantidad('${prod.codigo}', -1)">-</button>
                         <input class="cart-qty-input" type="number" inputmode="numeric" min="1" max="${prod.stock}" value="${item.cantidad}" aria-label="Cantidad de ${artLimpio}" onclick="this.select()" onchange="establecerCantidad('${prod.codigo}', this.value)">
@@ -2831,7 +3049,7 @@ async function generarPDFComprobante(datos) {
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(7.5);
         doc.setTextColor(120, 120, 120);
-        doc.text(`Cód. ${item.codigo}${item.mayoreo ? '  ·  Precio de mayoreo' : ''}`, colProducto, y + (nombreLineas.length > 1 ? 15 : 11));
+        doc.text(`Cód. ${item.codigo}${item.caja ? '  ·  Precio de caja/mayoreo surtido' : (item.mayoreo ? '  ·  Precio de mayoreo' : '')}`, colProducto, y + (nombreLineas.length > 1 ? 15 : 11));
         doc.setTextColor(30, 30, 30);
 
         doc.setFontSize(9);
@@ -2928,19 +3146,21 @@ async function enviarPedidoFinal() {
     carrito.forEach(item => {
         const prod = INVENTARIO_GLOBAL.find(p => p.codigo === item.codigo);
         if (prod) {
-            const precioUnit = precioUnitarioParaCantidad(prod, item.cantidad);
-            const esMay = esMayoreoAplicado(prod, item.cantidad);
+            const precioUnit = precioUnitarioDeItem(item, prod);
+            const esCajaItem = !!item.esCaja;
+            const esMay = !esCajaItem && esMayoreoAplicado(prod, item.cantidad);
             const sub = precioUnit * item.cantidad;
             subtotalProductos += sub;
             if (configCupon) {
                 const catProd = prod.categoria ? prod.categoria.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "general";
                 const catRestringida = configCupon.categoriaRestringida ? configCupon.categoriaRestringida.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "";
-                if ((!configCupon.categoriaRestringida || catProd === catRestringida) && (CUPON_APLICA_EN_MAYOREO || !esMay)) {
+                if ((!configCupon.categoriaRestringida || catProd === catRestringida) && (CUPON_APLICA_EN_MAYOREO || !(esMay || esCajaItem))) {
                     montoDescuento += sub * configCupon.descuento;
                 }
             }
-            textoMensajeWhatsApp += `▪️ ${item.cantidad}x [${prod.codigo}] ${prod.articulo}${esMay ? ` (mayoreo ${formatearDinero(precioUnit)} c/u)` : ''} - _${formatearDinero(sub)}_\n`;
-            productosParaAPI.push({ codigo: item.codigo, cantidad: item.cantidad, precio_unitario: precioUnit, mayoreo: esMay });
+            const etiquetaEspecial = esCajaItem ? ' (precio de caja/mayoreo surtido ' + formatearDinero(precioUnit) + ' c/u)' : (esMay ? ` (mayoreo ${formatearDinero(precioUnit)} c/u)` : '');
+            textoMensajeWhatsApp += `▪️ ${item.cantidad}x [${prod.codigo}] ${prod.articulo}${etiquetaEspecial} - _${formatearDinero(sub)}_\n`;
+            productosParaAPI.push({ codigo: item.codigo, cantidad: item.cantidad, precio_unitario: precioUnit, mayoreo: esMay, caja: esCajaItem });
 
             // Ruta de la imagen del producto para dibujarla en el PDF del comprobante.
             // Si no tiene imagen se deja vacía a propósito: así el PDF no intenta
@@ -2953,6 +3173,7 @@ async function enviarPedidoFinal() {
                 cantidad: item.cantidad,
                 precioUnit: precioUnit,
                 mayoreo: esMay,
+                caja: esCajaItem,
                 subtotal: sub,
                 rutaImagen: imgNombreItem ? `imagenes_productos/${imgNombreItem}` : ''
             });
