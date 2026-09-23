@@ -15,14 +15,14 @@
     {
         "codigo": "P2",
         "articulo": "Balon Metalico #5",
-        "precio": 70.0,
+        "precio": 80.0,
         "stock": 100,
         "categoria": "Balones",
         "imagen": "imagenes_productos/IMG_P2_1790145976.jpg",
         "destacado": false,
-        "precio_mayoreo": 58.0,
+        "precio_mayoreo": 55.0,
         "min_mayoreo": 6,
-        "precio_caja": 5500.0,
+        "precio_caja": 4200.0,
         "piezas_caja": 100
     },
     {
