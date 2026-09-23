@@ -35,8 +35,8 @@
         "destacado": false,
         "precio_mayoreo": 8.33,
         "min_mayoreo": 6,
-        "precio_caja": 96.0,
-        "piezas_caja": 12
+        "precio_caja": 4800.0,
+        "piezas_caja": 600
     },
     {
         "codigo": "p004",
