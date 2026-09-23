@@ -868,7 +868,8 @@ body.dark-mode .img-header-inicio { background: #fdf7ec; padding: 14px 22px; bor
 /* Precios: menudeo y mayoreo */
 .precio-menudeo { font-family: var(--font-display); font-weight: 600; font-size: 19px; color: var(--primary-light); margin: 0 0 4px 0; }
 .precio-tachado { text-decoration: line-through; color: var(--text-light); font-size: 12px; font-weight: 500; margin-left: 4px; }
-.badge-mayoreo { display: inline-block; margin: 0 0 8px 0; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 800; line-height: 1.3; background: rgba(47, 158, 94, 0.13); color: #1c7a45; border: 1px solid rgba(47, 158, 94, 0.35); }
+.badge-mayoreo { display: block; width: 100%; box-sizing: border-box; margin: 0 0 8px 0; padding: 6px 10px; border-radius: 14px; font-size: 11.5px; font-weight: 800; line-height: 1.35; text-align: center; background: rgba(47, 158, 94, 0.13); color: #1c7a45; border: 1px solid rgba(47, 158, 94, 0.35); }
+.badge-mayoreo-sub { display: block; font-size: 0.86em; font-weight: 700; opacity: .82; margin-top: 1px; }
 .badge-mayoreo.activo { background: var(--accent-green); color: #fff; border-color: var(--accent-green); }
 body.dark-mode .badge-mayoreo { color: #7fd6a3; }
 body.dark-mode .badge-mayoreo.activo { color: #0f2a1b; background: #7fd6a3; border-color: #7fd6a3; }
@@ -876,7 +877,8 @@ body.dark-mode .badge-mayoreo.activo { color: #0f2a1b; background: #7fd6a3; bord
 body.dark-mode .hint-mayoreo { color: #7fd6a3; }
 #info-ahorro-mayoreo { display: none; margin: 8px 0 12px 0; padding: 9px 12px; border-radius: 12px; background: rgba(47, 158, 94, 0.13); color: #1c7a45; font-weight: 800; font-size: 0.9rem; }
 body.dark-mode #info-ahorro-mayoreo { color: #7fd6a3; }
-.btn-caja { display: block; width: 100%; margin: 0 0 10px 0; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--accent-green); background: transparent; color: #1c7a45; font-weight: 800; font-size: 12.5px; cursor: pointer; transition: background .15s, color .15s; }
+.btn-caja { display: block; width: 100%; margin: 0 0 10px 0; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--accent-green); background: transparent; color: #1c7a45; font-weight: 800; font-size: 12.5px; line-height: 1.35; text-align: center; cursor: pointer; transition: background .15s, color .15s; }
+.btn-caja-sub { font-size: 0.9em; font-weight: 700; opacity: .82; }
 .btn-caja:hover { background: var(--accent-green); color: #fff; }
 body.dark-mode .btn-caja { color: #7fd6a3; border-color: #7fd6a3; }
 body.dark-mode .btn-caja:hover { background: #7fd6a3; color: #0f2a1b; }
@@ -1819,11 +1821,11 @@ function generarHTMLTarjeta(prod, esDestacada = false) {
             <span class="badge-mayoreo activo">★ Precio de mayoreo aplicado</span>`;
     } else {
         bloquePrecio = `<p class="precio-menudeo">${formatearDinero(prod.precio)}</p>` +
-            (infoCj.activo ? `<span class="badge-mayoreo">Caja: ${formatearDinero(infoCj.precioCaja)} c/${infoCj.piezas} pzs (${formatearDinero(infoCj.precio)} c/u)</span>` : '') +
-            (infoMay.activo ? `<span class="badge-mayoreo">Mayoreo: ${formatearDinero(infoMay.precio)} c/u desde ${infoMay.minimo} pzs</span>` : '');
+            (infoCj.activo ? `<span class="badge-mayoreo">Caja: de ${infoCj.piezas} pzs a ${formatearDinero(infoCj.precioCaja)}<span class="badge-mayoreo-sub">(${formatearDinero(infoCj.precio)} c/u)</span></span>` : '') +
+            (infoMay.activo ? `<span class="badge-mayoreo">Mayoreo: desde ${infoMay.minimo} pzs<span class="badge-mayoreo-sub">(${formatearDinero(infoMay.precio)} c/u)</span></span>` : '');
     }
     const botonCajaHTML = (infoCj.activo && !esAgotado && !(itemEnCarrito && itemEnCarrito.modo === 'caja'))
-        ? `<button class="btn-caja" onclick="comprarPorCaja('${prod.codigo}')">📦 Comprar por caja (${infoCj.piezas} pzs)</button>`
+        ? `<button class="btn-caja" onclick="comprarPorCaja('${prod.codigo}')">📦 Comprar por caja <span class="btn-caja-sub">(${infoCj.piezas} pzs)</span></button>`
         : '';
     const esFavorito = WISHLIST_GLOBAL.includes(prod.codigo) ? 'en-wishlist' : '';
 
@@ -2581,7 +2583,7 @@ function actualizarCarritoVisual() {
                 <img src="${rutaImagen}" alt="${artLimpio}" style="width: 50px; height: 50px; object-fit: contain;" onerror="this.src='https://placehold.co/50x50';">
                 <div style="flex: 1; min-width: 0;">
                     <h4 style="margin:0; font-size:13px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${artLimpio}</h4>
-                    <span style="font-size: 12px; color: var(--primary-light); font-weight: bold;">${formatearDinero(precioUnit)}${etiquetaAplicada ? ` <span class="precio-tachado">${formatearDinero(prod.precio)}</span> <span class="badge-mayoreo activo" style="margin:0;">${etiquetaAplicada}</span>` : ''}</span>
+                    <span style="font-size: 12px; color: var(--primary-light); font-weight: bold;">${formatearDinero(precioUnit)}${etiquetaAplicada ? ` <span class="precio-tachado">${formatearDinero(prod.precio)}</span> <span class="badge-mayoreo activo" style="margin:0; display:inline-block; width:auto;">${etiquetaAplicada}</span>` : ''}</span>
                     ${(!cajaAplicada && !mayoreoAplicado && infoCj.activo) ? `<div class="hint-mayoreo">Lleva ${infoCj.piezas - item.cantidad} más y pagas ${formatearDinero(infoCj.precio)} c/u (caja)</div>` : ''}
                     ${(!cajaAplicada && !mayoreoAplicado && !infoCj.activo && infoMay.activo) ? `<div class="hint-mayoreo">Lleva ${infoMay.minimo - item.cantidad} más y pagas ${formatearDinero(infoMay.precio)} c/u</div>` : ''}
                     <div style="display: flex; align-items: center; gap: 6px; margin-top: 5px;">
