@@ -878,7 +878,7 @@ body.dark-mode .hint-mayoreo { color: #7fd6a3; }
 #info-ahorro-mayoreo { display: none; margin: 8px 0 12px 0; padding: 9px 12px; border-radius: 12px; background: rgba(47, 158, 94, 0.13); color: #1c7a45; font-weight: 800; font-size: 0.9rem; }
 body.dark-mode #info-ahorro-mayoreo { color: #7fd6a3; }
 .btn-caja { display: block; width: 100%; margin: 0 0 10px 0; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--accent-green); background: transparent; color: #1c7a45; font-weight: 800; font-size: 12.5px; line-height: 1.35; text-align: center; cursor: pointer; transition: background .15s, color .15s; }
-.btn-caja-sub { font-size: 0.9em; font-weight: 700; opacity: .82; }
+.btn-caja-sub { display: block; font-size: 0.86em; font-weight: 700; opacity: .82; margin-top: 1px; }
 .btn-caja:hover { background: var(--accent-green); color: #fff; }
 body.dark-mode .btn-caja { color: #7fd6a3; border-color: #7fd6a3; }
 body.dark-mode .btn-caja:hover { background: #7fd6a3; color: #0f2a1b; }
@@ -1825,7 +1825,7 @@ function generarHTMLTarjeta(prod, esDestacada = false) {
             (infoMay.activo ? `<span class="badge-mayoreo">Mayoreo: desde ${infoMay.minimo} pzs<span class="badge-mayoreo-sub">(${formatearDinero(infoMay.precio)} c/u)</span></span>` : '');
     }
     const botonCajaHTML = (infoCj.activo && !esAgotado && !(itemEnCarrito && itemEnCarrito.modo === 'caja'))
-        ? `<button class="btn-caja" onclick="comprarPorCaja('${prod.codigo}')">📦 Comprar por caja <span class="btn-caja-sub">(${infoCj.piezas} pzs)</span></button>`
+        ? `<button class="btn-caja" onclick="comprarPorCaja('${prod.codigo}')">📦 Comprar por caja<span class="btn-caja-sub">(${infoCj.piezas} pzs)</span></button>`
         : '';
     const esFavorito = WISHLIST_GLOBAL.includes(prod.codigo) ? 'en-wishlist' : '';
 
