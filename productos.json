@@ -1,15 +1,1 @@
-[
-    {
-        "codigo": "p006",
-        "articulo": "Pelotas Trasparentes",
-        "precio": 12.0,
-        "stock": 600,
-        "categoria": "Pelotas",
-        "imagen": "imagenes_productos/IMG_p006_1790140201.jpg",
-        "destacado": false,
-        "precio_mayoreo": 8.33,
-        "min_mayoreo": 6,
-        "precio_caja": 4800.0,
-        "piezas_caja": 600
-    }
-]
+[]
