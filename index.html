@@ -880,6 +880,8 @@ body.dark-mode #info-ahorro-mayoreo { color: #7fd6a3; }
 .btn-caja:hover { background: var(--accent-green); color: #fff; }
 body.dark-mode .btn-caja { color: #7fd6a3; border-color: #7fd6a3; }
 body.dark-mode .btn-caja:hover { background: #7fd6a3; color: #0f2a1b; }
+.cant-caja-fija { font-weight: 800; font-size: 12.5px; color: #1c7a45; background: rgba(47, 158, 94, 0.13); padding: 6px 10px; border-radius: 8px; flex: 1; text-align: center; }
+body.dark-mode .cant-caja-fija { color: #7fd6a3; }
 .tarjeta-cant-input, .cart-qty-input { width: 54px; text-align: center; border: none; background: transparent; font-weight: 800; font-size: 14px; color: var(--text); font-family: inherit; -moz-appearance: textfield; appearance: textfield; padding: 0; }
 .cart-qty-input { width: 52px; border: 1px solid var(--border); border-radius: 6px; padding: 2px 0; background: var(--input-bg); }
 .tarjeta-cant-input::-webkit-outer-spin-button, .tarjeta-cant-input::-webkit-inner-spin-button,
@@ -1820,13 +1822,19 @@ function generarHTMLTarjeta(prod, esDestacada = false) {
             (infoCj.activo ? `<span class="badge-mayoreo">Caja: ${formatearDinero(infoCj.precioCaja)} c/${infoCj.piezas} pzs (${formatearDinero(infoCj.precio)} c/u)</span>` : '') +
             (infoMay.activo ? `<span class="badge-mayoreo">Mayoreo: ${formatearDinero(infoMay.precio)} c/u desde ${infoMay.minimo} pzs</span>` : '');
     }
-    const botonCajaHTML = (infoCj.activo && !esAgotado)
+    const botonCajaHTML = (infoCj.activo && !esAgotado && !(itemEnCarrito && itemEnCarrito.modo === 'caja'))
         ? `<button class="btn-caja" onclick="comprarPorCaja('${prod.codigo}')">📦 Comprar por caja (${infoCj.piezas} pzs)</button>`
         : '';
     const esFavorito = WISHLIST_GLOBAL.includes(prod.codigo) ? 'en-wishlist' : '';
 
     let botonFilaHTML = '';
-    if (itemEnCarrito) {
+    if (itemEnCarrito && itemEnCarrito.modo === 'caja') {
+        botonFilaHTML = `
+        <div class="tarjeta-controles-qty">
+            <span class="cant-caja-fija">📦 ${itemEnCarrito.cantidad} pzs (1 caja)</span>
+            <button class="tarjeta-btn-qty" onclick="eliminarDelCarritoVisual('${prod.codigo}')" aria-label="Quitar caja">🗑️</button>
+        </div>`;
+    } else if (itemEnCarrito) {
         botonFilaHTML = `
         <div class="tarjeta-controles-qty">
             <button class="tarjeta-btn-qty" onclick="cambiarCantidad('${prod.codigo}', -1)">-</button>
@@ -1895,7 +1903,21 @@ window.comprarPorCaja = function(codigo) {
         alert(`Solo hay ${prod.stock} pzs disponibles de este producto (la caja trae ${pz}).`);
         return;
     }
-    window.establecerCantidad(codigo, pz);
+    let item = carrito.find(i => i.codigo === codigo);
+    if (item) {
+        item.cantidad = pz;
+    } else {
+        item = { codigo: codigo, cantidad: pz };
+        carrito.push(item);
+    }
+    item.modo = 'caja';
+    reproducirSonido('agregar');
+    guardarCarritoEnLocalStorage();
+    actualizarCarritoVisual();
+    filtrarCatalogo();
+    renderizarDestacados();
+    renderizarWishlist();
+    dispararAnimacionCarrito();
 };
 
 window.establecerCantidad = function(codigo, valor) {
@@ -1913,6 +1935,7 @@ window.establecerCantidad = function(codigo, valor) {
         carrito = carrito.filter(i => i.codigo !== codigo);
     } else if (item) {
         item.cantidad = n;
+        delete item.modo;
     } else {
         carrito.push({ codigo: codigo, cantidad: n });
     }
@@ -1934,6 +1957,7 @@ window.cambiarCantidad = function(codigo, cambio) {
         if (prod.stock > item.cantidad) { 
             reproducirSonido('agregar');
             item.cantidad += 1; 
+            delete item.modo;
             dispararAnimacionCarrito(); 
         } else {
             reproducirSonido('error');
@@ -1943,6 +1967,7 @@ window.cambiarCantidad = function(codigo, cambio) {
     } else if (cambio === -1) {
         reproducirSonido('eliminar');
         item.cantidad -= 1;
+        delete item.modo;
         if (item.cantidad <= 0) {
             carrito = carrito.filter(i => i.codigo !== codigo);
         }
@@ -2560,9 +2585,11 @@ function actualizarCarritoVisual() {
                     ${(!cajaAplicada && !mayoreoAplicado && infoCj.activo) ? `<div class="hint-mayoreo">Lleva ${infoCj.piezas - item.cantidad} más y pagas ${formatearDinero(infoCj.precio)} c/u (caja)</div>` : ''}
                     ${(!cajaAplicada && !mayoreoAplicado && !infoCj.activo && infoMay.activo) ? `<div class="hint-mayoreo">Lleva ${infoMay.minimo - item.cantidad} más y pagas ${formatearDinero(infoMay.precio)} c/u</div>` : ''}
                     <div style="display: flex; align-items: center; gap: 6px; margin-top: 5px;">
+                        ${item.modo === 'caja' ? `<span class="cant-caja-fija">📦 ${item.cantidad} pzs (1 caja)</span>` : `
                         <button onclick="cambiarCantidad('${prod.codigo}', -1)">-</button>
                         <input class="cart-qty-input" type="number" inputmode="numeric" min="1" max="${prod.stock}" value="${item.cantidad}" aria-label="Cantidad de ${artLimpio}" onclick="this.select()" onchange="establecerCantidad('${prod.codigo}', this.value)">
                         <button onclick="cambiarCantidad('${prod.codigo}', 1)">+</button>
+                        `}
                     </div>
                 </div>
                 <div style="text-align: right;">
