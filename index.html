@@ -1476,10 +1476,10 @@ function cargarConfiguracionSitioFirebase() {
                 if (elCard) elCard.classList.toggle('sin-imagen', !hayImagen);
                 const elTitulo = document.getElementById('banner-titulo');
                 const elSubtitulo = document.getElementById('banner-subtitulo');
-                if (elBadge && banner.badge !== undefined) elBadge.textContent = banner.badge;
+                if (elBadge && banner.badge) elBadge.textContent = banner.badge;
                 if (elImg && banner.imagen) elImg.src = banner.imagen;
-                if (elTitulo && banner.titulo !== undefined) elTitulo.textContent = banner.titulo;
-                if (elSubtitulo && banner.subtitulo !== undefined) elSubtitulo.textContent = banner.subtitulo;
+                if (elTitulo && banner.titulo) elTitulo.textContent = banner.titulo;
+                if (elSubtitulo && banner.subtitulo) elSubtitulo.textContent = banner.subtitulo;
             }
         }
         // Si cfg.banner no existe todavía (nunca se ha guardado configuración),
@@ -3105,11 +3105,17 @@ function abrirModalDespacho() {
 window.abrirLightbox = function(src, titulo) {
     const modal = document.getElementById('lightbox-modal');
     const img = document.getElementById('lightbox-img');
-    if (modal && img) { modal.style.display = 'flex'; img.src = src; }
+    if (modal && img) {
+        modal.style.display = 'flex';
+        img.src = src;
+        document.body.style.overflow = 'hidden';
+    }
 };
 
 window.cerrarLightbox = function() {
-    const modal = document.getElementById('lightbox-modal'); if (modal) modal.style.display = 'none';
+    const modal = document.getElementById('lightbox-modal');
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = '';
 };
 
 function inicializarBotónVolverArriba() {
