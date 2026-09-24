@@ -115,5 +115,18 @@
         "min_mayoreo": 6,
         "precio_caja": 1825.0,
         "piezas_caja": 50
+    },
+    {
+        "codigo": "F1",
+        "articulo": "Vela Chispera",
+        "precio": 15.0,
+        "stock": 1000,
+        "categoria": "Fiestas",
+        "imagen": "imagenes_productos/IMG_F1_1790217851.jpg",
+        "destacado": false,
+        "precio_mayoreo": 7.5,
+        "min_mayoreo": 6,
+        "precio_caja": 325.0,
+        "piezas_caja": 50
     }
 ]
