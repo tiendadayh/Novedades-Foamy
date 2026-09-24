@@ -102,5 +102,18 @@
         "min_mayoreo": 6,
         "precio_caja": 0.0,
         "piezas_caja": 0
+    },
+    {
+        "codigo": "P6",
+        "articulo": "Calculadora Cientifica Economica",
+        "precio": 65.0,
+        "stock": 120,
+        "categoria": "Papelería",
+        "imagen": "imagenes_productos/IMG_P6_1790217739.jpg",
+        "destacado": false,
+        "precio_mayoreo": 42.5,
+        "min_mayoreo": 6,
+        "precio_caja": 1825.0,
+        "piezas_caja": 50
     }
 ]
