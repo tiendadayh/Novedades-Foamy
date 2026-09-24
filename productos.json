@@ -50,5 +50,18 @@
         "min_mayoreo": 6,
         "precio_caja": 0.0,
         "piezas_caja": 0
+    },
+    {
+        "codigo": "P2",
+        "articulo": "Caja De Colores Paper Mate De 24pz Largos",
+        "precio": 78.0,
+        "stock": 100,
+        "categoria": "Papelería",
+        "imagen": "imagenes_productos/IMG_P2_1790214494.jpg",
+        "destacado": false,
+        "precio_mayoreo": 69.5,
+        "min_mayoreo": 6,
+        "precio_caja": 0.0,
+        "piezas_caja": 0
     }
 ]
