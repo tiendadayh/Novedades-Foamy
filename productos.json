@@ -89,5 +89,18 @@
         "min_mayoreo": 6,
         "precio_caja": 0.0,
         "piezas_caja": 0
+    },
+    {
+        "codigo": "P5",
+        "articulo": "Caja De Colores Economicos 12pz Largos",
+        "precio": 25.0,
+        "stock": 100,
+        "categoria": "Papelería",
+        "imagen": "imagenes_productos/IMG_P5_1790216016.jpg",
+        "destacado": false,
+        "precio_mayoreo": 16.9,
+        "min_mayoreo": 6,
+        "precio_caja": 0.0,
+        "piezas_caja": 0
     }
 ]
