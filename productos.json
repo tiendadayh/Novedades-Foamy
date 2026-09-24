@@ -37,5 +37,18 @@
         "min_mayoreo": 6,
         "precio_caja": 4500.0,
         "piezas_caja": 100
+    },
+    {
+        "codigo": "P1",
+        "articulo": "Caja De Lapices De Colores Borrables 12pz",
+        "precio": 38.0,
+        "stock": 100,
+        "categoria": "Papelería",
+        "imagen": "imagenes_productos/IMG_P1_1790213285.jpg",
+        "destacado": false,
+        "precio_mayoreo": 28.5,
+        "min_mayoreo": 6,
+        "precio_caja": 0.0,
+        "piezas_caja": 0
     }
 ]
