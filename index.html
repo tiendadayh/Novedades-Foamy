@@ -1819,8 +1819,8 @@ function generarHTMLTarjeta(prod, esDestacada = false) {
             <span class="badge-mayoreo activo">★ Precio de mayoreo aplicado</span>`;
     } else {
         bloquePrecio = `<p class="precio-menudeo">${formatearDinero(prod.precio)}</p>` +
-            (infoCj.activo ? `<span class="badge-mayoreo">Caja: de ${infoCj.piezas} pzs a ${formatearDinero(infoCj.precioCaja)}<span class="badge-mayoreo-sub">(${formatearDinero(infoCj.precio)} c/u)</span></span>` : '') +
-            (infoMay.activo ? `<span class="badge-mayoreo">Mayoreo: desde ${infoMay.minimo} pzs<span class="badge-mayoreo-sub">(${formatearDinero(infoMay.precio)} c/u)</span></span>` : '');
+            (infoMay.activo ? `<span class="badge-mayoreo">Mayoreo: desde ${infoMay.minimo} pzs<span class="badge-mayoreo-sub">(${formatearDinero(infoMay.precio)} c/u)</span></span>` : '') +
+            (infoCj.activo ? `<span class="badge-mayoreo">Caja: de ${infoCj.piezas} pzs a ${formatearDinero(infoCj.precioCaja)}<span class="badge-mayoreo-sub">(${formatearDinero(infoCj.precio)} c/u)</span></span>` : '');
     }
     const botonCajaHTML = (infoCj.activo && !esAgotado && !(itemEnCarrito && itemEnCarrito.modo === 'caja'))
         ? `<button class="btn-caja" onclick="comprarPorCaja('${prod.codigo}')">📦 Comprar por caja<span class="btn-caja-sub">(${infoCj.piezas} pzs)</span></button>`
