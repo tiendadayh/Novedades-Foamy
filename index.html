@@ -2864,7 +2864,17 @@ async function generarPDFComprobante(datos) {
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(7.5);
         doc.setTextColor(120, 120, 120);
-        doc.text(`Cód. ${item.codigo}${item.caja ? '  ·  Precio de caja' : (item.mayoreo ? '  ·  Precio de mayoreo' : '')}`, colProducto, y + (nombreLineas.length > 1 ? 15 : 11));
+        const yCodigo = y + (nombreLineas.length > 1 ? 15 : 11);
+        const textoCodigo = `Cód. ${item.codigo}  ·  `;
+        doc.text(textoCodigo, colProducto, yCodigo);
+        const anchoTextoCodigo = doc.getTextWidth(textoCodigo);
+        // Tipo de precio aplicado a este producto: Menudeo, Mayoreo o Caja (con color)
+        const tipoPrecio = item.caja ? 'PRECIO DE CAJA' : (item.mayoreo ? 'PRECIO DE MAYOREO' : 'PRECIO DE MENUDEO');
+        const colorTipo = item.caja ? [16, 122, 69] : (item.mayoreo ? [37, 99, 235] : [107, 114, 128]);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(colorTipo[0], colorTipo[1], colorTipo[2]);
+        doc.text(tipoPrecio, colProducto + anchoTextoCodigo, yCodigo);
+        doc.setFont('helvetica', 'normal');
         doc.setTextColor(30, 30, 30);
 
         doc.setFontSize(9);
@@ -2881,24 +2891,27 @@ async function generarPDFComprobante(datos) {
     // --- Totales ---
     if (y + 35 > altoPagina - 20) { doc.addPage(); y = 20; }
     y += 6;
+    // Las etiquetas van alineadas a la derecha en una columna fija, lejos de los
+    // montos, para que "TOTAL:" y la cifra nunca queden pegados.
+    const colEtiquetaTotales = colSubtotal - 42;
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text('Subtotal:', colPrecio, y);
+    doc.text('Subtotal:', colEtiquetaTotales, y, { align: 'right' });
     doc.text(formatearDinero(datos.subtotalProductos), colSubtotal, y, { align: 'right' });
-    y += 7;
+    y += 8;
     if (datos.montoDescuento > 0) {
         doc.setTextColor(16, 185, 129);
-        doc.text('Descuento:', colPrecio, y);
+        doc.text('Descuento:', colEtiquetaTotales, y, { align: 'right' });
         doc.text(`-${formatearDinero(datos.montoDescuento)}`, colSubtotal, y, { align: 'right' });
         doc.setTextColor(30, 30, 30);
-        y += 7;
+        y += 8;
     }
     doc.setDrawColor(30, 30, 30);
-    doc.line(colPrecio - 5, y, margenX + anchoUtil, y);
-    y += 7;
+    doc.line(colSubtotal - 75, y, colSubtotal, y);
+    y += 9;
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(13);
-    doc.text('TOTAL:', colPrecio, y);
+    doc.text('TOTAL:', colEtiquetaTotales, y, { align: 'right' });
     doc.text(formatearDinero(datos.totalGeneral), colSubtotal, y, { align: 'right' });
 
     // --- Pie de página ---
@@ -2973,8 +2986,8 @@ async function enviarPedidoFinal() {
                     montoDescuento += sub * configCupon.descuento;
                 }
             }
-            const etiquetaTxt = esCaj ? 'caja' : (esMay ? 'mayoreo' : '');
-            textoMensajeWhatsApp += `▪️ ${item.cantidad}x [${prod.codigo}] ${prod.articulo}${etiquetaTxt ? ` (${etiquetaTxt} ${formatearDinero(precioUnit)} c/u)` : ''} - _${formatearDinero(sub)}_\n`;
+            const etiquetaTxt = esCaj ? 'caja' : (esMay ? 'mayoreo' : 'menudeo');
+            textoMensajeWhatsApp += `▪️ ${item.cantidad}x [${prod.codigo}] ${prod.articulo} (${etiquetaTxt} ${formatearDinero(precioUnit)} c/u) - _${formatearDinero(sub)}_\n`;
             productosParaAPI.push({ codigo: item.codigo, cantidad: item.cantidad, precio_unitario: precioUnit, mayoreo: esMay, caja: esCaj });
 
             // Ruta de la imagen del producto para dibujarla en el PDF del comprobante.
