@@ -3070,7 +3070,8 @@ async function enviarPedidoFinal() {
         }
     } catch (err) {
         console.error("No se pudo enviar el pedido al punto de venta (sin conexión a Firebase):", err);
-        alert("No se pudo conectar con el punto de venta. Tu pedido se enviará por WhatsApp, pero confirma directamente que el stock siga disponible.");
+        const detalleErr = (err && (err.code || err.message)) ? `\n\nDetalle técnico: ${err.code || err.message}` : '';
+        alert("No se pudo enviar el pedido al punto de venta. Tu pedido se enviará por WhatsApp, pero confirma directamente que el stock siga disponible." + detalleErr);
     } finally {
         reproducirSonido('pedido');
         carrito = [];
@@ -3081,7 +3082,11 @@ async function enviarPedidoFinal() {
         if (/^\d{10,15}$/.test(TELEFONO_WHATSAPP)) {
             window.open(`https://wa.me/${TELEFONO_WHATSAPP}?text=${encodeURIComponent(textoMensajeWhatsApp)}`, '_blank');
         } else {
-            alert("Tu pedido quedó registrado, pero falta configurar el WhatsApp de la tienda para abrir el chat. Avísale a la tienda.");
+            if (window.__seg && window.__seg.registrado) {
+                alert("Tu pedido quedó registrado, pero falta configurar el WhatsApp de la tienda para abrir el chat. Avísale a la tienda.");
+            } else {
+                alert("Tu pedido NO quedó registrado en la tienda y además falta configurar el WhatsApp de la tienda. Contacta a la tienda directamente para hacer tu pedido.");
+            }
         }
         if(btnEnviar) { btnEnviar.innerText = textoOriginal; btnEnviar.disabled = false; }
         if (window.__seg && window.__seg.registrado && typeof window.seguimientoPedidoRegistrado === 'function') {
