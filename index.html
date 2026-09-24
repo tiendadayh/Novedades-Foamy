@@ -244,6 +244,18 @@ body {
     box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.35), var(--shadow-lg) !important;
 }
 
+
+/* Logo de la tienda usado como imagen cuando un producto no tiene foto (en vez de un texto gris); el logo trae fondo blanco */
+.producto-card img.img-sin-foto, .tarjeta-cross img.img-sin-foto, .item-carrito img.img-sin-foto {
+    object-fit: contain !important;
+    box-sizing: border-box;
+    padding: 8px;
+    background: #fff;
+    border-radius: 10px;
+}
+.producto-card:hover img.img-sin-foto { transform: none; }
+.lightbox-img.img-sin-foto { background: #fff; padding: 24px; box-sizing: border-box; max-width: min(90%, 420px); }
+
 .img-wrapper { 
     width: 100%; 
     height: 140px; 
@@ -1207,6 +1219,16 @@ body.dark-mode .seg-cancelado { color: #ff8c87; }
     </footer>
 
     <script>
+// Logo de la tienda: se usa cuando un producto no tiene foto o la foto no carga.
+const LOGO_SIN_FOTO = 'imagenes_eventos/logo_inicio.png';
+function imagenSinFoto(el) {
+    if (!el) return;
+    el.onerror = null;                // evita bucles si el logo tampoco carga
+    el.classList.add('img-sin-foto');
+    el.src = LOGO_SIN_FOTO;
+}
+</script>
+    <script>
 // === REGISTRO DEL SERVICE WORKER ===
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -1795,7 +1817,7 @@ function generarHTMLTarjeta(prod, esDestacada = false) {
 
     const arrImg = obtenerArregloImagenes(prod);
     let imgN = arrImg[0] ? arrImg[0].split(/[/\\\\]/).pop() : '';
-    let rImg = imgN ? `imagenes_productos/${imgN}` : 'https://placehold.co/300?text=No+disponible';
+    let rImg = imgN ? `imagenes_productos/${imgN}` : LOGO_SIN_FOTO;
     let img2N = arrImg.length > 1 ? arrImg[1].split(/[/\\\\]/).pop() : '';
     let rImg2 = img2N ? `imagenes_productos/${img2N}` : rImg;
 
@@ -1854,10 +1876,10 @@ function generarHTMLTarjeta(prod, esDestacada = false) {
             <div class="producto-codigo">CÓDIGO: ${prod.codigo}</div>
             <div class="img-wrapper" style="cursor: zoom-in;" onclick="abrirLightbox('${rImg}', '${artLimpio}')">
                 ${bIzq} 
-                <img id="${idImg}" src="${rImg}" alt="${artLimpio}" loading="lazy" decoding="async"
+                <img id="${idImg}" src="${rImg}" alt="${artLimpio}" class="${imgN ? '' : 'img-sin-foto'}" loading="lazy" decoding="async"
                      onmouseover="if('${rImg2}' !== '${rImg}') this.src='${rImg2}'"
                      onmouseout="this.src='${rImg}'"
-                     onerror="this.onerror=null; this.src='https://placehold.co/300?text=${encodeURIComponent(artLimpio)}'"> 
+                     onerror="imagenSinFoto(this)"> 
                 ${bDer}
             </div>
             <h3>${artLimpio}</h3>
@@ -2331,7 +2353,7 @@ window.moverImagenCarrusel = function (codigo, direccion) {
     if (indicesCarrusel[codigo] >= images.length) indicesCarrusel[codigo] = 0;
     else if (indicesCarrusel[codigo] < 0) indicesCarrusel[codigo] = images.length - 1;
     let imgName = images[indicesCarrusel[codigo]].split(/[/\\\\]/).pop();
-    let nRuta = imgName ? `imagenes_productos/${imgName}` : 'https://placehold.co/300';
+    let nRuta = imgName ? `imagenes_productos/${imgName}` : LOGO_SIN_FOTO;
     
     const imgNormal = document.getElementById(`img-carrusel-${codigo}`);
     const imgDest = document.getElementById(`img-carrusel-dest-${codigo}`);
@@ -2563,13 +2585,13 @@ function actualizarCarritoVisual() {
 
         const arrImg = obtenerArregloImagenes(prod);
         let imgNombre = arrImg[0] ? arrImg[0].split(/[/\\\\]/).pop() : '';
-        let rutaImagen = imgNombre ? `imagenes_productos/${imgNombre}` : 'https://placehold.co/50x50?text=Prod';
+        let rutaImagen = imgNombre ? `imagenes_productos/${imgNombre}` : LOGO_SIN_FOTO;
         const artLimpio = prod.articulo.replace(/</g, "&lt;").replace(/>/g, "&gt;");
         const etiquetaAplicada = cajaAplicada ? 'Caja' : (mayoreoAplicado ? 'Mayoreo' : '');
 
         const itemHTML = `
             <div class="item-carrito" style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border);">
-                <img src="${rutaImagen}" alt="${artLimpio}" style="width: 50px; height: 50px; object-fit: contain;" onerror="this.src='https://placehold.co/50x50';">
+                <img src="${rutaImagen}" alt="${artLimpio}" class="${imgNombre ? '' : 'img-sin-foto'}" style="width: 50px; height: 50px; object-fit: contain;" onerror="imagenSinFoto(this)">
                 <div style="flex: 1; min-width: 0;">
                     <h4 style="margin:0; font-size:13px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${artLimpio}</h4>
                     <span style="font-size: 12px; color: var(--primary-light); font-weight: bold;">${formatearDinero(precioUnit)}${etiquetaAplicada ? ` <span class="precio-tachado">${formatearDinero(prod.precio)}</span> <span class="badge-mayoreo activo" style="margin:0; display:inline-block; width:auto;">${etiquetaAplicada}</span>` : ''}</span>
@@ -2703,10 +2725,10 @@ function renderizarCrossSelling() {
             ${sugeridos.map(p => {
                 const arrImg = obtenerArregloImagenes(p);
                 let imgN = arrImg[0] ? arrImg[0].split(/[/\\\\]/).pop() : '';
-                let rImg = imgN ? `imagenes_productos/${imgN}` : 'https://placehold.co/50x50?text=Prod';
+                let rImg = imgN ? `imagenes_productos/${imgN}` : LOGO_SIN_FOTO;
                 return `
                 <div class="tarjeta-cross">
-                    <img src="${rImg}" alt="${p.articulo}" loading="lazy" decoding="async" onerror="this.src='https://placehold.co/50x50';">
+                    <img src="${rImg}" alt="${p.articulo}" class="${imgN ? '' : 'img-sin-foto'}" loading="lazy" decoding="async" onerror="imagenSinFoto(this)">
                     <div class="info-cross">
                         <strong title="${p.articulo}">${p.articulo}</strong>
                         <span>${formatearDinero(p.precio)}</span>
@@ -2739,13 +2761,17 @@ function cargarImagenBase64ParaPDF(rutaImagen) {
                 const imagen = new Image();
                 imagen.onload = () => {
                     try {
+                        const ancho = imagen.naturalWidth || 100;
+                        const alto = imagen.naturalHeight || 100;
                         const canvas = document.createElement('canvas');
-                        canvas.width = imagen.naturalWidth || 100;
-                        canvas.height = imagen.naturalHeight || 100;
+                        canvas.width = ancho;
+                        canvas.height = alto;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(imagen, 0, 0);
                         URL.revokeObjectURL(urlObjeto);
-                        resolve(canvas.toDataURL('image/png'));
+                        // Se devuelven también las medidas para poder dibujarla en el PDF
+                        // SIN deformarla (antes se estiraba a un cuadrado y se veía torcida).
+                        resolve({ data: canvas.toDataURL('image/png'), w: ancho, h: alto });
                     } catch (errCanvas) {
                         URL.revokeObjectURL(urlObjeto);
                         resolve(null);
@@ -2756,6 +2782,14 @@ function cargarImagenBase64ParaPDF(rutaImagen) {
             })
             .catch(() => resolve(null));
     });
+}
+
+// Dibuja una imagen dentro de una caja (x, y, ancho, alto) manteniendo su proporción y centrada.
+function dibujarImagenAjustadaPDF(doc, img, x, y, cajaW, cajaH) {
+    const escala = Math.min(cajaW / img.w, cajaH / img.h);
+    const w = img.w * escala;
+    const h = img.h * escala;
+    doc.addImage(img.data, 'PNG', x + (cajaW - w) / 2, y + (cajaH - h) / 2, w, h);
 }
 
 // Genera el comprobante en PDF del pedido con una tabla de productos que
@@ -2773,17 +2807,28 @@ async function generarPDFComprobante(datos) {
     const imagenesBase64 = await Promise.all(
         datos.items.map(item => cargarImagenBase64ParaPDF(item.rutaImagen))
     );
+    // Logo de la tienda: va en el encabezado y sustituye a los productos sin foto
+    const logoPDF = await cargarImagenBase64ParaPDF(LOGO_SIN_FOTO);
 
     // --- Encabezado ---
     doc.setFillColor(42, 118, 176);
     doc.rect(0, 0, anchoPagina, 30, 'F');
     doc.setTextColor(255, 255, 255);
+    // Logo en una tarjeta blanca con esquinas redondeadas (el logo trae fondo blanco y así no se ve un cuadro dentro de otro)
+    let xTitulo = margenX;
+    if (logoPDF) {
+        doc.setFillColor(255, 255, 255);
+        doc.roundedRect(margenX, 3.5, 23, 23, 3, 3, 'F');
+        try { dibujarImagenAjustadaPDF(doc, logoPDF, margenX + 1.5, 5, 20, 20); } catch (e) { /* no crítico */ }
+        xTitulo = margenX + 28;
+    }
+    doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(20);
-    doc.text('NOVEDADES EL FOAMY', margenX, 15);
+    doc.text('NOVEDADES EL FOAMY', xTitulo, 15);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(11);
-    doc.text('Comprobante de Pedido', margenX, 23);
+    doc.text('Comprobante de Pedido', xTitulo, 23);
     doc.setFontSize(9);
     doc.text(new Date().toLocaleString('es-MX'), anchoPagina - margenX, 23, { align: 'right' });
 
@@ -2842,19 +2887,21 @@ async function generarPDFComprobante(datos) {
             dibujarEncabezadoTabla();
         }
 
-        // Imagen del producto, o un recuadro "Sin foto" si no se pudo cargar
+        // Imagen del producto. Si no tiene foto (o no se pudo cargar) se pone el logo de la
+        // tienda sobre una tarjeta blanca, en vez de un recuadro gris con la leyenda "Sin foto".
         const img64 = imagenesBase64[indice];
         if (img64) {
-            try { doc.addImage(img64, 'PNG', colImg, y, 18, 18); }
+            try { dibujarImagenAjustadaPDF(doc, img64, colImg, y, 18, 18); }
             catch (e) { doc.setDrawColor(200, 200, 200); doc.rect(colImg, y, 18, 18); }
+        } else if (logoPDF) {
+            doc.setFillColor(255, 255, 255);
+            doc.setDrawColor(228, 228, 228);
+            doc.roundedRect(colImg, y, 18, 18, 2, 2, 'FD');
+            try { dibujarImagenAjustadaPDF(doc, logoPDF, colImg + 1.2, y + 1.2, 15.6, 15.6); } catch (e) { /* no crítico */ }
         } else {
             doc.setDrawColor(200, 200, 200);
             doc.setFillColor(240, 240, 240);
             doc.rect(colImg, y, 18, 18, 'FD');
-            doc.setFontSize(6);
-            doc.setTextColor(150, 150, 150);
-            doc.text('Sin foto', colImg + 9, y + 10, { align: 'center' });
-            doc.setTextColor(30, 30, 30);
         }
 
         doc.setFontSize(9);
@@ -2992,7 +3039,7 @@ async function enviarPedidoFinal() {
 
             // Ruta de la imagen del producto para dibujarla en el PDF del comprobante.
             // Si no tiene imagen se deja vacía a propósito: así el PDF no intenta
-            // descargar un placeholder y solo dibuja un recuadro "Sin foto".
+            // descargar un placeholder; el PDF pone el logo de la tienda en su lugar.
             const arrImgItem = obtenerArregloImagenes(prod);
             const imgNombreItem = arrImgItem[0] ? arrImgItem[0].split(/[/\\\\]/).pop() : '';
             itemsParaPDF.push({
