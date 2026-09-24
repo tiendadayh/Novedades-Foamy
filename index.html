@@ -33,7 +33,6 @@
 
     <!-- Librerías de soporte e integración externa -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <!-- Firebase (sincroniza catálogo, stock y pedidos con el punto de venta) -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -1409,7 +1408,6 @@ let indicesCarrusel = {};
 
 let codigoCuponActivo = "";
 let cargoPorEnvio = 0; 
-let yaExplotoConfettiEnvio = false; 
 
 // Los cupones ya NO están fijos en el código: se crean desde el punto de venta
 // (botón "🎟 CUPONES" en TIENDA_FOAMY.py) y se guardan en Firebase bajo el nodo
@@ -2006,13 +2004,6 @@ function verificarCarritoGuardadoAlEntrar() {
     }
 }
 
-function lanzarEfectoConfeti() {
-    if (typeof confetti === 'function') {
-        confetti({ particleCount: 80, angle: 60, spread: 60, origin: { x: 0, y: 0.8 } });
-        confetti({ particleCount: 80, angle: 120, spread: 60, origin: { x: 1, y: 0.8 } });
-    }
-}
-
 function mostrarSkeletons() {
     const contenedor = document.getElementById('lista-productos');
     if (!contenedor) return;
@@ -2478,7 +2469,6 @@ function vaciarCarrito() {
         reproducirSonido('eliminar');
         carrito = [];
         codigoCuponActivo = "";
-        yaExplotoConfettiEnvio = false; 
         const msgCupon = document.getElementById('mensaje-cupon');
         const inputCupon = document.getElementById('input-cupon');
         if(msgCupon) msgCupon.textContent = "";
@@ -2507,7 +2497,6 @@ function actualizarCarritoVisual() {
     const puntoEntrega = document.getElementById('select-punto-entrega');
 
     if (carrito.length === 0) {
-        yaExplotoConfettiEnvio = false; 
         if (cont) {
             cont.innerHTML = `
                 <div class="empty-view">
@@ -2604,13 +2593,6 @@ function actualizarCarritoVisual() {
 
     const metaEnvio = 150.00;
     const alcanzoEnvioGratis = subtotalGeneral >= metaEnvio;
-
-    if (alcanzoEnvioGratis && !yaExplotoConfettiEnvio) {
-        lanzarEfectoConfeti();
-        yaExplotoConfettiEnvio = true; 
-    } else if (!alcanzoEnvioGratis) {
-        yaExplotoConfettiEnvio = false; 
-    }
 
     if (infoEnvioGratis) {
         infoEnvioGratis.style.display = "block";
