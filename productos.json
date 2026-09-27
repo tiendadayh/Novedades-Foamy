@@ -120,7 +120,7 @@
         "codigo": "F1",
         "articulo": "Vela Chispera",
         "precio": 15.0,
-        "stock": 950,
+        "stock": 1000,
         "categoria": "Fiestas",
         "imagen": "imagenes_productos/IMG_F1_1790217851.jpg",
         "destacado": false,
